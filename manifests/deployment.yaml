@@ -1,0 +1,45 @@
+# Kubernetes API version used for Deployments
+apiVersion: apps/v1
+
+# Type of Kubernetes resource
+kind: Deployment
+
+# Information that identifies this Deployment
+metadata:
+  # Name of the Deployment
+  name: nginx
+
+  # Labels attached to the Deployment
+  labels:
+    app: nginx
+
+# Desired configuration of the Deployment
+spec:
+  # Number of Pods Kubernetes should keep running
+  replicas: 2
+
+  # Tells the Deployment which Pods it manages
+  selector:
+    matchLabels:
+      app: nginx
+
+  # Blueprint used to create each Pod
+  template:
+    metadata:
+      # Labels attached to every Pod
+      labels:
+        app: nginx
+
+    spec:
+      # List of containers inside each Pod
+      containers:
+        # Name of the container
+        - name: nginx
+
+          # Container image and version
+          image: nginx:1.27
+
+          # Ports exposed by the container
+          ports:
+            # NGINX listens on port 80
+            - containerPort: 80
