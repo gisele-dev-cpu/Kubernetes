@@ -1,0 +1,14 @@
+# Core Kubernetes API
+apiVersion: v1
+
+# Resource type
+kind: ConfigMap
+
+# Information about the ConfigMap
+metadata:
+  name: app-config
+
+# Key-value pairs
+data:
+  environment: "dev"
+  company: "Gisele Technologies"
