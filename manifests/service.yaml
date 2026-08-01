@@ -1,0 +1,32 @@
+# Kubernetes API version
+apiVersion: v1
+
+# Resource type
+kind: Service
+
+# Information about the Service
+metadata:
+  # Service name
+  name: nginx
+
+  labels:
+    app: nginx
+
+# Desired state
+spec:
+
+  # Select Pods with this label
+  selector:
+    app: nginx
+
+  # Expose outside the cluster (good for Minikube labs)
+  type: NodePort
+
+  # Network configuration
+  ports:
+
+    # Service port
+    - port: 80
+
+      # Port on the Pod
+      targetPort: 80

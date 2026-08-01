@@ -1,0 +1,67 @@
+# Kubernetes API version for Deployments
+apiVersion: apps/v1
+
+# Resource type
+kind: StatefulSet
+
+# Metadata identifies the Deployment
+metadata:
+  # Name of the Deployment
+  name: mysql
+
+  # Labels attached to the Deployment
+  labels:
+    app: db1
+
+# Desired state of the Deployment
+spec:
+  # Number of Pods Kubernetes should keep running
+  replicas: 2
+
+  # Deployment manages Pods with this label
+  selector:
+    matchLabels:
+      app: db1
+
+  # Template used to create each Pod
+  template:
+    metadata:
+      # Labels attached to every Pod
+      labels:
+        app: db1
+
+    # Pod specification
+    spec:
+
+      # Storage available to the Pod
+      volumes:
+        # Logical name of the volume
+        - name: mysql-storage
+
+          # The volume comes from a PersistentVolumeClaim
+          persistentVolumeClaim:
+
+            # Name of the PVC to use
+            claimName: mysql-pvc
+
+      # List of containers inside the Pod
+      containers:
+
+        # Container name
+        - name: mysql
+
+          # Container image
+          image: mysql:latest
+
+          # Port exposed by the container
+          ports:
+            - containerPort: 3306
+
+          # Mount the volume inside this container
+          volumeMounts:
+
+            # Must match the volume name above
+            - name: mysql-storage
+
+              # Directory inside the container where the storage is mounted
+              mountPath: /var/lib/mysql

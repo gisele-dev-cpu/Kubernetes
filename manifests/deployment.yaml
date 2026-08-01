@@ -1,10 +1,11 @@
-# Kubernetes API version used for Deployments
+```yaml
+# Kubernetes API version for Deployments
 apiVersion: apps/v1
 
-# Type of Kubernetes resource
+# Resource type
 kind: Deployment
 
-# Information that identifies this Deployment
+# Metadata identifies the Deployment
 metadata:
   # Name of the Deployment
   name: nginx
@@ -13,33 +14,109 @@ metadata:
   labels:
     app: nginx
 
-# Desired configuration of the Deployment
+# Desired state of the Deployment
 spec:
   # Number of Pods Kubernetes should keep running
   replicas: 2
 
-  # Tells the Deployment which Pods it manages
+  # Deployment manages Pods with this label
   selector:
     matchLabels:
       app: nginx
 
-  # Blueprint used to create each Pod
+  # Template used to create each Pod
   template:
     metadata:
       # Labels attached to every Pod
       labels:
         app: nginx
 
+    # Pod specification
     spec:
-      # List of containers inside each Pod
+
+      # Storage available to the Pod
+      volumes:
+        # Logical name of the volume
+        - name: mysql-storage
+
+          # The volume comes from a PersistentVolumeClaim
+          persistentVolumeClaim:
+
+            # Name of the PVC to use
+            claimName: mysql-pvc
+
+      # List of containers inside the Pod
       containers:
-        # Name of the container
+
+        # Container name
         - name: nginx
 
-          # Container image and version
+          # Container image
           image: nginx:1.27
 
-          # Ports exposed by the container
+          # Port exposed by the container
           ports:
-            # NGINX listens on port 80
             - containerPort: 80
+
+          # Checks whether NGINX has finished starting
+          startupProbe:
+            httpGet:
+              # NGINX default page
+              path: /
+
+              # Container port to check
+              port: 80
+
+            # Run the check every 5 seconds
+            periodSeconds: 5
+
+            # Wait up to 2 seconds for a response
+            timeoutSeconds: 2
+
+            # Allow up to 12 failures during startup
+            # 12 failures × 5 seconds = about 60 seconds
+            failureThreshold: 12
+
+          # Checks whether NGINX is ready to receive traffic
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+
+            # Check readiness every 5 seconds
+            periodSeconds: 5
+
+            # Wait up to 2 seconds for a response
+            timeoutSeconds: 2
+
+            # Remove the Pod from Service endpoints
+            # after 3 consecutive failures
+            failureThreshold: 3
+
+            # One successful check marks the Pod ready
+            successThreshold: 1
+
+          # Checks whether NGINX is still healthy
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+
+            # Check health every 10 seconds
+            periodSeconds: 10
+
+            # Wait up to 2 seconds for a response
+            timeoutSeconds: 2
+
+            # Restart the container after 3
+            # consecutive failures
+            failureThreshold: 3
+
+          # Mount the volume inside this container
+          volumeMounts:
+
+            # Must match the volume name above
+            - name: mysql-storage
+
+              # Directory inside the container where storage is mounted
+              mountPath: /usr/share/nginx/html

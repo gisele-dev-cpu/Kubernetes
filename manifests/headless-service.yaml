@@ -1,0 +1,130 @@
+# =========================================================
+# 1. SECRET
+# Stores the MySQL root password
+# =========================================================
+
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: mysql-secret
+
+type: Opaque
+
+# stringData accepts plain text.
+# Kubernetes converts it into the Secret's stored data format.
+stringData:
+  MYSQL_ROOT_PASSWORD: "change-me-now"
+
+---
+
+# =========================================================
+# 2. HEADLESS SERVICE
+# Gives the StatefulSet Pod a stable network identity
+# =========================================================
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: mysql
+
+  labels:
+    app: mysql
+
+spec:
+  # clusterIP: None makes this a headless Service
+  clusterIP: None
+
+  # The Service finds Pods with this label
+  selector:
+    app: mysql
+
+  ports:
+    # Name of the Service port
+    - name: mysql
+
+      # Port exposed by the Service
+      port: 3306
+
+      # Port used by the MySQL container
+      targetPort: 3306
+
+---
+
+# =========================================================
+# 3. STATEFULSET
+# Runs MySQL with stable identity and persistent storage
+# =========================================================
+
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: mysql
+
+  labels:
+    app: mysql
+
+spec:
+  # Must match the name of the headless Service
+  serviceName: mysql
+
+  # Start with one MySQL instance
+  replicas: 1
+
+  # StatefulSet manages Pods with this label
+  selector:
+    matchLabels:
+      app: mysql
+
+  # Blueprint used to create each MySQL Pod
+  template:
+    metadata:
+      labels:
+        app: mysql
+
+    spec:
+      containers:
+        - name: mysql
+
+          # Pin a specific version instead of using latest
+          image: mysql:8.4
+
+          ports:
+            - name: mysql
+              containerPort: 3306
+
+          # Inject the password from the Secret
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+
+          # Mount this Pod's dedicated volume
+          volumeMounts:
+            - name: mysql-storage
+
+              # MySQL stores its database files here
+              mountPath: /var/lib/mysql
+
+  # Automatically creates one PVC for each StatefulSet Pod
+  volumeClaimTemplates:
+    - metadata:
+        # Must match the name under volumeMounts
+        name: mysql-storage
+
+      spec:
+        # One node can mount the volume read-write
+        accessModes:
+          - ReadWriteOnce
+
+        # Minikube's default StorageClass can provision the PV
+        storageClassName: standard
+
+        resources:
+          requests:
+            storage: 10Gi
