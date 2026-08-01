@@ -1,0 +1,23 @@
+# Kubernetes API version for a PersistentVolumeClaim
+apiVersion: v1
+
+# The resource requests persistent storage
+kind: PersistentVolumeClaim
+
+metadata:
+  # Name the Pod will use to reference this claim
+  name: mysql-pvc
+
+  # Labels must be written under labels
+  labels:
+    app: mysql
+
+spec:
+  # The volume can be mounted read-write by one node
+  accessModes:
+    - ReadWriteOnce
+
+  # Amount of storage requested
+  resources:
+    requests:
+      storage: 10Gi
