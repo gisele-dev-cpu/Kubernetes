@@ -1,4 +1,3 @@
-```yaml
 # Kubernetes API version for Deployments
 apiVersion: apps/v1
 
