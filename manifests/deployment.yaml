@@ -13,7 +13,7 @@ metadata:
   labels:
     app: nginx
 
-# Desired state of the Deployment
+# Desired state of the Deployments
 spec:
   # Number of Pods Kubernetes should keep running
   replicas: 2
