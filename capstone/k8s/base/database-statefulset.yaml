@@ -1,0 +1,92 @@
+# Kubernetes API version for StatefulSets
+apiVersion: apps/v1
+
+# StatefulSet is used because MySQL requires stable identity and storage
+kind: StatefulSet
+
+metadata:
+  # Name of the StatefulSet
+  name: shopsphere-database
+
+spec:
+  # Headless Service used by the StatefulSet for stable network identity
+  serviceName: shopsphere-database
+
+  # We are starting with one MySQL instance
+  replicas: 1
+
+  # StatefulSet manages Pods with this label
+  selector:
+    matchLabels:
+      app: shopsphere-database
+
+  # Blueprint used to create the MySQL Pod
+  template:
+    metadata:
+      labels:
+        app: shopsphere-database
+
+    spec:
+      containers:
+        - name: mysql
+
+          # MySQL container image
+          image: mysql:8.4
+
+          # MySQL listens on port 3306
+          ports:
+            - containerPort: 3306
+
+          # Environment variables required by MySQL
+          # Values are pulled from our Kubernetes Secret
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shopsphere-db-secret
+                  key: MYSQL_ROOT_PASSWORD
+
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: shopsphere-db-secret
+                  key: MYSQL_DATABASE
+
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: shopsphere-db-secret
+                  key: MYSQL_USER
+
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shopsphere-db-secret
+                  key: MYSQL_PASSWORD
+
+          # Mount persistent storage inside the MySQL container
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+
+          # Resource reservation and limits
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+  # StatefulSet creates a PVC for the MySQL Pod
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-storage
+
+      spec:
+        accessModes:
+          - ReadWriteOnce
+
+        resources:
+          requests:
+            storage: 5Gi
