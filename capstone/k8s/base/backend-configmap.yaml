@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: shopsphere-backend-config
+
+data:
+  DB_HOST: shopsphere-database
+  DB_PORT: "3306"
+  DB_NAME: shopsphere

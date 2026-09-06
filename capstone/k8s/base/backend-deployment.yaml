@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: shopsphere-backend:v1
+          image: shopsphere-backend:v2
 
           ports:
             - containerPort: 5000
@@ -45,3 +45,34 @@ spec:
               port: 5000
             initialDelaySeconds: 10
             periodSeconds: 15
+           
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-backend-config
+                  key: DB_HOST
+
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-backend-config
+                  key: DB_PORT
+
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: shopsphere-backend-config
+                  key: DB_NAME
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: shopsphere-backend-secret
+                  key: DB_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shopsphere-backend-secret
+                  key: DB_PASSWORD
