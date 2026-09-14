@@ -12,3 +12,4 @@ resources:
   - database-secret.yaml
   - database-service.yaml
   - database-statefulset.yaml
+  - database-init-configmap.yaml
