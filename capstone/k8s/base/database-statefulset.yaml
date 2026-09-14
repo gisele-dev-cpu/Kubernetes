@@ -64,12 +64,16 @@ spec:
                   name: shopsphere-db-secret
                   key: MYSQL_PASSWORD
 
-          # Mount persistent storage inside the MySQL container
+          # Mount persistent MySQL data storage
+          # and initialization SQL from the ConfigMap
           volumeMounts:
             - name: mysql-storage
               mountPath: /var/lib/mysql
 
-          # Resource reservation and limits
+            - name: db-init
+              mountPath: /docker-entrypoint-initdb.d
+
+          # CPU and memory allocation for MySQL
           resources:
             requests:
               cpu: 250m
@@ -78,7 +82,13 @@ spec:
               cpu: 500m
               memory: 512Mi
 
-  # StatefulSet creates a PVC for the MySQL Pod
+      # Pod-level volume backed by the initialization ConfigMap
+      volumes:
+        - name: db-init
+          configMap:
+            name: shopsphere-db-init
+
+  # Creates a persistent PVC for each StatefulSet Pod
   volumeClaimTemplates:
     - metadata:
         name: mysql-storage
