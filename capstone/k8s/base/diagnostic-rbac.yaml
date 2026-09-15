@@ -1,0 +1,33 @@
+# 1. WHO
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: shopsphere-diagnostic
+
+---
+# 2. WHAT PERMISSIONS
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: shopsphere-diagnostic-reader
+
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services"]
+    verbs: ["get", "list", "watch"]
+
+---
+# 3. CONNECT WHO → PERMISSIONS
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: shopsphere-diagnostic-reader-binding
+
+subjects:
+  - kind: ServiceAccount
+    name: shopsphere-diagnostic
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: shopsphere-diagnostic-reader

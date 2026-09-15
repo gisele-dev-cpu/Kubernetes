@@ -27,6 +27,7 @@ spec:
         app: shopsphere-database
 
     spec:
+      serviceAccountName: shopsphere-database
       containers:
         - name: mysql
 

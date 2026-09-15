@@ -13,3 +13,5 @@ resources:
   - database-service.yaml
   - database-statefulset.yaml
   - database-init-configmap.yaml
+  - service-accounts.yaml
+  - diagnostic-rbac.yaml

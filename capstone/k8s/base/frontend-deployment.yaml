@@ -17,6 +17,7 @@ spec:
         app: shopsphere-frontend
 
     spec:
+      serviceAccountName: shopsphere-frontend
       containers:
         - name: frontend
           image: shopsphere-frontend:v1
