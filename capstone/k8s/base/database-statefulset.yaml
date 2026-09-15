@@ -73,6 +73,33 @@ spec:
             - name: db-init
               mountPath: /docker-entrypoint-initdb.d
 
+          startupProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -uroot -p"$MYSQL_ROOT_PASSWORD"
+            periodSeconds: 5
+            failureThreshold: 12
+
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -uroot -p"$MYSQL_ROOT_PASSWORD"
+            periodSeconds: 10
+            failureThreshold: 3
+
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -uroot -p"$MYSQL_ROOT_PASSWORD"
+            periodSeconds: 15
+            failureThreshold: 3
+
           # CPU and memory allocation for MySQL
           resources:
             requests:
