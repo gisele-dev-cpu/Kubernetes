@@ -17,6 +17,7 @@ spec:
         app: shopsphere-backend
 
     spec:
+      serviceAccountName: shopsphere-backend
       containers:
         - name: backend
           image: shopsphere-backend:v2
