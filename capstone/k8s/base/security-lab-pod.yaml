@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-backend-test
+  namespace: security-lab
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    seccompProfile:
+      type: RuntimeDefault
+
+  containers:
+    - name: backend
+      image: shopsphere-backend:v2
+      imagePullPolicy: IfNotPresent
+
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+
+      ports:
+        - containerPort: 5000

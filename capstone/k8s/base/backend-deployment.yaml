@@ -18,10 +18,27 @@ spec:
 
     spec:
       serviceAccountName: shopsphere-backend
+
+      automountServiceAccountToken: false
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+
+
       containers:
         - name: backend
           image: shopsphere-backend:v2
 
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          
           ports:
             - containerPort: 5000
 
