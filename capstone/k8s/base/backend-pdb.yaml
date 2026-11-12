@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: shopsphere-backend-pdb
+  namespace: shopsphere-dev
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: shopsphere-backend
